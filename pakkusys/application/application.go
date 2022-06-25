@@ -153,8 +153,8 @@ func (boot *PakkuBoot) BootStart() ipakku.Application {
 // BootStartWeb 以web服务方式启动, https证书放在conf目录下自动加载
 func (boot *PakkuBoot) BootStartWeb(debug bool) {
 	// bootstart
-	boot.EnableCoreModule().EnableNetModule().BootStart()
 	boot.GetApplication().SetParam("AppService.debug", debug)
+	boot.EnableCoreModule().EnableNetModule().BootStart()
 	// 获取appservice接口
 	var config ipakku.AppConfig
 	var service ipakku.AppService
