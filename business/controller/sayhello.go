@@ -35,9 +35,12 @@ func (ctl *SayHelloCtl) AsController() ipakku.ControllerConfig {
 				{http.MethodGet, "/hello", ctl.SayHello},
 			},
 		},
-		// FilterConfig: ipakku.FilterConfig{
-		// 	FilterFunc: [][]interface{}{},
-		// },
+		FilterConfig: []ipakku.FilterConfigItem{
+			{
+				Path: "",
+				Func: ipakku.Filter4Passed,
+			},
+		},
 	}
 }
 

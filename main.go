@@ -13,17 +13,19 @@ package main
 
 import (
 	"flag"
-	"pakkuboot/pakkusys/application"
+	"pakkuboot/pakkusys/bootstarter"
 )
 
 func main() {
 	name := flag.String("name", "pakkuapp", "App id, default pakkuapp")
 	logger := flag.String("logger", "console", "logger: console, file or unset, default console")
-	loglevel := flag.String("loglevel", "debug", "loglevel: debug, info, error or none, default debug")
+	loglevel := flag.String("info", "debug", "loglevel: debug, info, error or none, default debug")
 	logdir := flag.String("logdir", "./logs", "default ./logs/{application name}.log")
 	flag.Parse()
+
 	// 启动应用&启用web服务
-	application.ApplicationBoot(*name).SetLogger(*logger, *logdir, *loglevel)
+	appBoot := bootstarter.NewSimpleBootStarter(*name).SetLogger(*logger, *logdir, *loglevel)
+
 	// 启动&&web服务
-	application.BootStartWeb(*loglevel == "debug")
+	appBoot.BootStartWeb(*loglevel == "debug")
 }

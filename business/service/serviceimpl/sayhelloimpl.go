@@ -18,7 +18,7 @@ import (
 
 // SayHelloImpl 示例模块
 type SayHelloImpl struct {
-	conf ipakku.AppConfig `@autowired:"AppConfig"`
+	conf ipakku.AppConfig `@autowired:""`
 }
 
 // AsModule 作为一个模块加载
@@ -27,9 +27,9 @@ func (b *SayHelloImpl) AsModule() ipakku.Opts {
 		Name:        "SayHello",
 		Version:     1.0,
 		Description: "Say 'Hello'",
-		OnReady: func(mctx ipakku.Loader) {
+		OnReady: func(app ipakku.Application) {
 			logs.Debugln("on ready event")
-			b.conf.SetConfig("on-ready", mctx.GetInstanceID())
+			b.conf.SetConfig("on-ready", app.GetInstanceID())
 		},
 		OnInit: func() {
 			logs.Debugln("on init event")

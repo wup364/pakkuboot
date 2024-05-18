@@ -9,7 +9,9 @@
 
 package pakkusys
 
-import "github.com/wup364/pakku/ipakku"
+import (
+	"github.com/wup364/pakku/ipakku"
+)
 
 // ModuleEvent 模块事件监听注册对象
 type ModuleEvent struct {
@@ -23,4 +25,17 @@ type OverrideModule struct {
 	Interface string      // 接口名字 ICache, Ixxx
 	Implement string      // 新的接口实例注册名称
 	Instance  interface{} // 可选-实现实例对象, 不为空则自动注册
+}
+
+// ApplicationRT app实例部分接口
+type ApplicationRT interface {
+
+	// GetInstanceID 获取实例的ID
+	GetInstanceID() string
+
+	// Params 实例中的键值对数据
+	Params() ipakku.Params
+
+	// PakkuModules 默认模块Getter
+	PakkuModules() ipakku.PakkuModulesGetter
 }

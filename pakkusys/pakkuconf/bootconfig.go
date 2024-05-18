@@ -11,6 +11,7 @@
 package pakkuconf
 
 import (
+	"io"
 	"pakkuboot/business/controller"
 	"pakkuboot/business/service/serviceimpl"
 	"pakkuboot/pakkusys"
@@ -19,32 +20,42 @@ import (
 	"github.com/wup364/pakku/utils/logs"
 )
 
+// EnablePakkuModules 加载额外的自带模块
+func EnablePakkuModules(modules ipakku.PakkuModuleBuilder) {
+	modules.EnableAppEvent()
+}
+
 // RegisterModules 注册需要加载的模块
-func RegisterModules() []ipakku.Module {
+func RegisterModules(art pakkusys.ApplicationRT) []ipakku.Module {
 	return []ipakku.Module{
 		new(serviceimpl.SayHelloImpl),
 	}
 }
 
-// RegisterController 注册需要加载的controller
-func RegisterController() []ipakku.Controller {
+// RegisterHttpController 注册需要加载的controller
+func RegisterHttpController(art pakkusys.ApplicationRT) []ipakku.Controller {
 	return []ipakku.Controller{
 		new(controller.SayHelloCtl),
 	}
 }
 
+// RegisterHttpRequestFilter 注册需要加载的http过滤器
+func RegisterHttpRequestFilter(art pakkusys.ApplicationRT) []ipakku.FilterConfigItem {
+	return []ipakku.FilterConfigItem{}
+}
+
 // RegisterRPCService 注册需要加载的gorpc
-func RegisterRPCService() []interface{} {
+func RegisterRPCService(art pakkusys.ApplicationRT) []interface{} {
 	return []interface{}{}
 }
 
 // RegisterModuleEvent 注册模块加载事件
-func RegisterModuleEvent() []pakkusys.ModuleEvent {
+func RegisterModuleEvent(art pakkusys.ApplicationRT) []pakkusys.ModuleEvent {
 	return []pakkusys.ModuleEvent{
 		{
 			Module: new(serviceimpl.SayHelloImpl).AsModule().Name,
 			Event:  ipakku.ModuleEventOnLoaded,
-			Handler: func(module interface{}, _ ipakku.Loader) {
+			Handler: func(module interface{}, _ ipakku.Application) {
 				logs.Infoln("ModuleEventOnLoaded: " + module.(ipakku.Module).AsModule().Name)
 			},
 		},
@@ -52,7 +63,7 @@ func RegisterModuleEvent() []pakkusys.ModuleEvent {
 }
 
 // RegisterOverride 注册复写的模块
-func RegisterOverride() []pakkusys.OverrideModule {
+func RegisterOverride(art pakkusys.ApplicationRT) []pakkusys.OverrideModule {
 	return []pakkusys.OverrideModule{
 		// {
 		// 	Interface: "ICache",
@@ -60,4 +71,9 @@ func RegisterOverride() []pakkusys.OverrideModule {
 		// 	Instance:  nil,
 		// },
 	}
+}
+
+// RegisterLoggerWriter 设置日志持久化写入器
+func RegisterLoggerWriter(logdir, logName string) io.Writer {
+	return NewLoggerWriter4File(logdir, logName)
 }

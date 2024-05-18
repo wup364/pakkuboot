@@ -1,7 +1,6 @@
 module pakkuboot
 
-go 1.14
+go 1.18
 
-// replace github.com/wup364/pakku => ../pakku
 
-require github.com/wup364/pakku v0.0.1
+require github.com/wup364/pakku v0.0.8
