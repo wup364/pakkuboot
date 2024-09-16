@@ -1,0 +1,33 @@
+@server=http://127.0.0.1:8080
+
+
+
+### 创建用户
+POST {{server}}/user/v1 HTTP/1.1 
+Content-Type: application/json
+
+{
+    "account": "admin",
+    "userName": "管理员",
+    "passwd": "123"
+}
+
+
+### 修改用户
+PUT {{server}}/user/v1/id HTTP/1.1 
+Content-Type: application/json
+
+{
+    "account": "admin",
+    "userName": "管理员",
+    "passwd": "123"
+}
+
+
+### 查询用户
+GET {{server}}/user/v1?userName=&account=admin HTTP/1.1 
+Content-Type: application/x-www-form-urlencoded
+
+
+
+

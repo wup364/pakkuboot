@@ -17,7 +17,6 @@ import (
 	"pakkuboot/pakkusys"
 
 	"github.com/wup364/pakku/ipakku"
-	"github.com/wup364/pakku/utils/logs"
 )
 
 // EnablePakkuModules 加载额外的自带模块
@@ -28,14 +27,15 @@ func EnablePakkuModules(modules ipakku.PakkuModuleBuilder) {
 // RegisterModules 注册需要加载的模块
 func RegisterModules(art pakkusys.ApplicationRT) []ipakku.Module {
 	return []ipakku.Module{
-		new(serviceimpl.SayHelloImpl),
+		new(serviceimpl.PakkuDataSourceImpl),
+		new(serviceimpl.UserManagementImpl),
 	}
 }
 
 // RegisterHttpController 注册需要加载的controller
 func RegisterHttpController(art pakkusys.ApplicationRT) []ipakku.Controller {
 	return []ipakku.Controller{
-		new(controller.SayHelloCtl),
+		new(controller.UserManagementCtl),
 	}
 }
 
@@ -52,13 +52,7 @@ func RegisterRPCService(art pakkusys.ApplicationRT) []interface{} {
 // RegisterModuleEvent 注册模块加载事件
 func RegisterModuleEvent(art pakkusys.ApplicationRT) []pakkusys.ModuleEvent {
 	return []pakkusys.ModuleEvent{
-		{
-			Module: new(serviceimpl.SayHelloImpl).AsModule().Name,
-			Event:  ipakku.ModuleEventOnLoaded,
-			Handler: func(module interface{}, _ ipakku.Application) {
-				logs.Infoln("ModuleEventOnLoaded: " + module.(ipakku.Module).AsModule().Name)
-			},
-		},
+		initDefaultDataSource(),
 	}
 }
 

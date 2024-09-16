@@ -7,41 +7,68 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 // IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// 示例模块-实现SayHello接口
+// 示例模块-实现UserManagement接口
 package serviceimpl
 
 import (
+	"pakkuboot/business/objects/cmds"
+	"pakkuboot/business/objects/dtos"
+	"pakkuboot/business/repository"
+	"pakkuboot/business/repository/dataobject"
+	"pakkuboot/business/repository/repositoryutil"
+	"pakkuboot/utils/datasource"
+
 	"github.com/wup364/pakku/ipakku"
 	"github.com/wup364/pakku/utils/logs"
-	"github.com/wup364/pakku/utils/strutil"
 )
 
-// SayHelloImpl 示例模块
-type SayHelloImpl struct {
-	conf ipakku.AppConfig `@autowired:""`
+// UserManagementImpl 示例模块
+type UserManagementImpl struct {
+	repository.UserRepo
+	ds datasource.PakkuDataSource `@autowired:""`
 }
 
 // AsModule 作为一个模块加载
-func (b *SayHelloImpl) AsModule() ipakku.Opts {
+func (m *UserManagementImpl) AsModule() ipakku.Opts {
 	return ipakku.Opts{
-		Name:        "SayHello",
 		Version:     1.0,
-		Description: "Say 'Hello'",
+		Name:        "UserManagement",
+		Description: "示例模块",
 		OnReady: func(app ipakku.Application) {
 			logs.Debugln("on ready event")
-			b.conf.SetConfig("on-ready", app.GetInstanceID())
 		},
 		OnInit: func() {
 			logs.Debugln("on init event")
 		},
 		OnSetup: func() {
 			logs.Debugln("on setup event")
-			b.conf.SetConfig("on-setup", strutil.GetUUID())
+			if err := repositoryutil.ExecuteDDL(m.ds, dataobject.UserInfoPo{}); nil != err {
+				logs.Panicln(err)
+			}
 		},
 	}
 }
 
-func (b *SayHelloImpl) SayHello() string {
-	logs.Infoln("function invoke SayHello")
-	return "SayHello: " + b.conf.GetConfig("on-setup").ToString("") + ":" + b.conf.GetConfig("on-ready").ToString("") + ":" + strutil.GetUUID()
+// Create 创建用户
+func (um *UserManagementImpl) Create(cmd cmds.CreateUserCmd) (res dtos.UserInfo, err error) {
+	var user *dataobject.UserInfoPo
+	if user, err = um.UserRepo.Create(um.ds, dataobject.UserInfoPo{
+		Account:  cmd.Account,
+		UserName: cmd.UserName,
+		UserPWD:  cmd.UserName,
+	}); nil != err {
+		return
+	}
+	res = dtos.UserInfo{
+		ID:       user.ID,
+		Account:  user.Account,
+		UserName: user.UserName,
+		CTime:    user.CTime,
+	}
+	return
+}
+
+// Query 查询用户
+func (um *UserManagementImpl) Query(cmd cmds.QueryUserCmd) (res dtos.PageableResult[dtos.UserInfo], err error) {
+	return um.UserRepo.Query(um.ds, cmd)
 }

@@ -1,14 +1,14 @@
 # pakkuboot 快速搭建服务模板
 
-    使用pakku工具包封装的web服务快速开发实例, demo默认实现了一个syahello的http服务. 可在此模板的基础上开发新模块.
+    使用pakku工具包封装的web服务快速开发实例, demo默认实现了一个UserManagement的http服务. 可供参考.
 
 ## 快速开发
 
     1. 拉取本项目到本地, 根据需要调整文件夹和文件名
-    2. 在business下通过编写service、controller等实现业务逻辑(默认demo: syahello.go)
-    3. 在 `bootconfig.go` 中注册对应的对象(默认demo: syahello.go)
+    2. 在business下通过编写service、controller等实现业务逻辑
+    3. 在 `bootconfig.go` 中注册对应的对象
     4. 运行或编译 'main.go`
-    5. 浏览器访问 'http://127.0.0.1:8080/sayhello/v1/hello'
+    5. 浏览器访问 'http://127.0.0.1:8080/user/v1'
 
 ### 目录说明
 
@@ -39,7 +39,7 @@
 
 ### 模块的编写
 
-    通常围绕着`Module`、`Controller`编写业务, business下包含一个`SayHello`的服务和controller.
+    通常围绕着`Module`、`Controller`编写业务, business下包含一个`UserManagement`的服务和controller.
 
 ## pakku 帕克概述
 
