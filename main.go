@@ -21,7 +21,7 @@ import (
 func main() {
 	name := flag.String("name", "pakkuapp", "App id, default pakkuapp")
 	logger := flag.String("logger", "console", "logger: console, file or unset, default console")
-	loglevel := flag.String("info", "debug", "loglevel: debug, info, error or none, default debug")
+	loglevel := flag.String("loglevel", "debug", "loglevel: debug, info, error or none, default debug")
 	logdir := flag.String("logdir", "./logs", "default ./logs/{application name}.log")
 	flag.Parse()
 
