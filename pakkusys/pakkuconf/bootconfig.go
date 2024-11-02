@@ -15,6 +15,9 @@ import (
 	"pakkuboot/business/controller"
 	"pakkuboot/business/service/serviceimpl"
 	"pakkuboot/pakkusys"
+	"pakkuboot/pakkusys/pakkuconf/datasource"
+	"pakkuboot/pakkusys/pakkuconf/logger"
+	"pakkuboot/pakkusys/sysmodules/pakkudatasource"
 
 	"github.com/wup364/pakku/ipakku"
 )
@@ -27,7 +30,7 @@ func EnablePakkuModules(modules ipakku.PakkuModuleBuilder) {
 // RegisterModules 注册需要加载的模块
 func RegisterModules(art pakkusys.ApplicationRT) []ipakku.Module {
 	return []ipakku.Module{
-		new(serviceimpl.PakkuDataSourceImpl),
+		new(pakkudatasource.PakkuDataSourceImpl),
 		new(serviceimpl.UserManagementImpl),
 	}
 }
@@ -52,7 +55,7 @@ func RegisterRPCService(art pakkusys.ApplicationRT) []interface{} {
 // RegisterModuleEvent 注册模块加载事件
 func RegisterModuleEvent(art pakkusys.ApplicationRT) []pakkusys.ModuleEvent {
 	return []pakkusys.ModuleEvent{
-		initDefaultDataSource(),
+		datasource.OnAppConfigSetupSucced(),
 	}
 }
 
@@ -69,5 +72,5 @@ func RegisterOverride(art pakkusys.ApplicationRT) []pakkusys.OverrideModule {
 
 // RegisterLoggerWriter 设置日志持久化写入器
 func RegisterLoggerWriter(logdir, logName string) io.Writer {
-	return NewLoggerWriter4File(logdir, logName)
+	return logger.NewLoggerWriter4File(logdir, logName)
 }

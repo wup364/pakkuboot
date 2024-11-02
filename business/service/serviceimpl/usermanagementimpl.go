@@ -16,7 +16,7 @@ import (
 	"pakkuboot/business/repository"
 	"pakkuboot/business/repository/dataobject"
 	"pakkuboot/business/repository/repositoryutil"
-	"pakkuboot/utils/datasource"
+	"pakkuboot/pakkusys/sysmodules/pakkudatasource"
 
 	"github.com/wup364/pakku/ipakku"
 	"github.com/wup364/pakku/utils/logs"
@@ -25,7 +25,7 @@ import (
 // UserManagementImpl 示例模块
 type UserManagementImpl struct {
 	repository.UserRepo
-	ds datasource.PakkuDataSource `@autowired:""`
+	ds pakkudatasource.PakkuDataSource `@autowired:""`
 }
 
 // AsModule 作为一个模块加载

@@ -7,46 +7,41 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 // IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package pakkuconf
+// 数据源配置
+package datasource
 
 import (
-	"fmt"
+	"database/sql"
 	"pakkuboot/pakkusys"
+	"pakkuboot/pakkusys/sysconstants"
+	"time"
 
 	"github.com/wup364/pakku/ipakku"
-	"github.com/wup364/pakku/utils/fileutil"
-	"github.com/wup364/pakku/utils/logs"
 )
 
-// initDefaultDataSource 设置默认的数据源配置
-func initDefaultDataSource() pakkusys.ModuleEvent {
+// OnAppConfigSetupSucced 配置模块成功安装结束事件监听
+func OnAppConfigSetupSucced() pakkusys.ModuleEvent {
 	return pakkusys.ModuleEvent{
 		Module: ipakku.ModuleID.AppConfig,
 		Event:  ipakku.ModuleEventOnSetupSucced,
 		Handler: func(module interface{}, app ipakku.Application) {
-			logs.Infoln("[模块监听] 设置默认的数据源配置, 若无需要请删除")
-
-			app.Modules().OnModuleEvent(ipakku.ModuleID.AppConfig, ipakku.ModuleEventOnLoaded, func(module interface{}, app ipakku.Application) {
-				appConfig := module.(ipakku.AppConfig)
-				if len(appConfig.GetConfig("datasource.driver").ToString("")) > 0 {
-					return
-				}
-
-				if err := appConfig.SetConfig("datasource.driver", "sqlite3"); nil != err {
-					logs.Panicln(err)
-				}
-
-				appName := app.Params().GetParam(ipakku.PARAMS_KEY_APPNAME).ToString(ipakku.DEFT_VAL_APPNAME)
-				if err := appConfig.SetConfig("datasource.url", fmt.Sprintf(".datas/%s.db?cache=shared", appName)); nil != err {
-					logs.Panicln(err)
-				}
-
-				if !fileutil.IsExist(".datas") {
-					if err := fileutil.Mkdir(".datas"); nil != err {
-						logs.Panicln(err)
-					}
-				}
-			})
+			// 初始化数据源配置文件
+			initDataSourceConfigFile(app.Modules())
 		},
 	}
+}
+
+// GetDataSource 初始化数据源配置, 获得sql.DB对象
+func GetDataSource(dsSetting DataSourceSetting) (db *sql.DB, err error) {
+	if db, err = sql.Open(dsSetting.DriverName, dsSetting.DataSourceName); nil == err {
+		if dsSetting.DriverName == sysconstants.C_DB_TYPE_SQLITE3 {
+			// database is locked
+			// https://github.com/mattn/go-sqlite3/issues/209
+			// ds.db.SetMaxOpenConns(1)
+		} else {
+			// ds.db.SetMaxIdleConns(250)
+			db.SetConnMaxLifetime(time.Hour)
+		}
+	}
+	return
 }

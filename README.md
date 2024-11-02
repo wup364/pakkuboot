@@ -1,6 +1,6 @@
 # pakkuboot 快速搭建服务模板
 
-    使用pakku工具包封装的web服务快速开发实例, demo默认实现了一个UserManagement的http服务. 可供参考.
+    使用pakku工具包封装的web服务快速开发实例, demo默认实现了一个UserManagement的http服务.
 
 ## 快速开发
 
@@ -8,7 +8,7 @@
     2. 在business下通过编写service、controller等实现业务逻辑
     3. 在 `bootconfig.go` 中注册对应的对象
     4. 运行或编译 'main.go`
-    5. 浏览器访问 'http://127.0.0.1:8080/user/v1'
+    5. 浏览器访问 'http://127.0.0.1:8080/user/v1', 或使用`_apis`文件夹中的http文件测试
 
 ### 目录说明
 

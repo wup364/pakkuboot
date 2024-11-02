@@ -13,6 +13,7 @@ package bootstarter
 
 import (
 	"pakkuboot/pakkusys/pakkuconf"
+	"pakkuboot/pakkusys/sysconstants"
 	"path/filepath"
 	"sync"
 
@@ -119,7 +120,7 @@ func (boot *SimpleBootStarter) BootStartWeb(debug bool) {
 		}
 	}
 
-	// 注册controller
+	// 注册http过滤器
 	for _, v := range pakkuconf.RegisterHttpRequestFilter(boot.pakkuapp) {
 		if err := service.Filter(v.Path, v.Func); nil != err {
 			logs.Panicln(err)
@@ -131,7 +132,7 @@ func (boot *SimpleBootStarter) BootStartWeb(debug bool) {
 	config := boot.pakkuapp.PakkuModules().GetAppConfig()
 	service.StartHTTP(ipakku.HTTPServiceConfig{
 		Debug:      debug,
-		ListenAddr: config.GetConfig("listen.http.address").ToString(":8080"),
+		ListenAddr: config.GetConfig(sysconstants.CONFIG_KEY_HTTP_LISTEN_ADDRESS).ToString(sysconstants.DEFAULT_VAL_LISTEN_ADDRESS),
 		CertFile:   certFile,
 		KeyFile:    keyFile,
 	})
@@ -158,14 +159,14 @@ func (boot *SimpleBootStarter) BootStartRpc() {
 	config := boot.pakkuapp.PakkuModules().GetAppConfig()
 	service.StartRPC(ipakku.RPCServiceConfig{
 		Debug:      false,
-		ListenAddr: config.GetConfig("listen.rpc.address").ToString(":8080"),
+		ListenAddr: config.GetConfig(sysconstants.CONFIG_KEY_RPC_LISTEN_ADDRESS).ToString(sysconstants.DEFAULT_VAL_LISTEN_ADDRESS),
 	})
 }
 
 // initialLogdir 初始化本地日志目录
 func initialLogdir(logdir string) string {
 	if len(logdir) == 0 {
-		logdir = "./logs"
+		logdir = sysconstants.DEFAULT_VAL_LOG_DIR
 	}
 	if !filepath.IsAbs(logdir) {
 		if path, err := filepath.Abs(logdir); nil != err {
@@ -184,11 +185,11 @@ func initialLogdir(logdir string) string {
 
 // getCertFile 获取https证书
 func getCertFile() (certFile string, keyFile string) {
-	if fileutil.IsFile("./.conf/key.pem") {
-		certFile = "./.conf/key.pem"
+	if fileutil.IsFile(sysconstants.DEFAULT_VAL_CERT_KEY_FILE_PATH) {
+		keyFile = sysconstants.DEFAULT_VAL_CERT_KEY_FILE_PATH
 	}
-	if fileutil.IsFile("./.conf/cert.pem") {
-		certFile = "./.conf/cert.pem"
+	if fileutil.IsFile(sysconstants.DEFAULT_VAL_CERT_FILE_PATH) {
+		certFile = sysconstants.DEFAULT_VAL_CERT_FILE_PATH
 	}
 	return
 }

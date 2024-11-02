@@ -7,20 +7,20 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 // IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package serviceimpl
+package pakkudatasource
 
 import (
 	"database/sql"
-	"pakkuboot/utils/datasource"
-	"time"
+	"pakkuboot/pakkusys/pakkuconf/datasource"
 
 	"github.com/wup364/pakku/ipakku"
 	"github.com/wup364/pakku/utils/logs"
+	"github.com/wup364/pakku/utils/sqlexecutor"
 )
 
 // PakkuDataSourceImpl 数据源
 type PakkuDataSourceImpl struct {
-	datasource.SqlExecutor
+	sqlexecutor.SqlExecutor
 	db        *sql.DB
 	dsSetting *datasource.DataSourceSetting `@autoConfig:""`
 }
@@ -55,9 +55,9 @@ func (ds *PakkuDataSourceImpl) Begin() (*sql.Tx, error) {
 }
 
 // GetTxExecutor 开启一个事务, 返回sql执行器
-func (ds *PakkuDataSourceImpl) GetTxExecutor() (datasource.SqlTxExecutor, error) {
+func (ds *PakkuDataSourceImpl) GetTxExecutor() (sqlexecutor.SqlTxExecutor, error) {
 	if tx, err := ds.Begin(); nil == err {
-		return datasource.NewSqlExecutor4Tx(ds.GetDriverName(), tx), nil
+		return sqlexecutor.NewSqlExecutor4Tx(ds.GetDriverName(), tx), nil
 	} else {
 		return nil, err
 	}
@@ -69,18 +69,9 @@ func (ds *PakkuDataSourceImpl) initial() (err error) {
 		return
 	}
 
-	if ds.db, err = sql.Open(ds.dsSetting.DriverName, ds.dsSetting.DataSourceName); nil == err {
-		if ds.dsSetting.DriverName == "sqlite3" {
-			// database is locked
-			// https://github.com/mattn/go-sqlite3/issues/209
-			// ds.db.SetMaxOpenConns(1)
-		} else {
-			// ds.db.SetMaxIdleConns(250)
-			ds.db.SetConnMaxLifetime(time.Hour)
-		}
-
+	if ds.db, err = datasource.GetDataSource(*ds.dsSetting); nil == err {
 		// 初始化其他对象
-		ds.SqlExecutor = datasource.NewSqlExecutor4Normal(ds.dsSetting.DriverName, ds.db)
+		ds.SqlExecutor = sqlexecutor.NewSqlExecutor4Normal(ds.dsSetting.DriverName, ds.db)
 	}
 	return
 }

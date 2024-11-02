@@ -15,10 +15,10 @@ import (
 	"pakkuboot/business/objects/cmds"
 	"pakkuboot/business/objects/dtos"
 	"pakkuboot/business/repository/dataobject"
-	"pakkuboot/utils/datasource"
 	"time"
 
 	"github.com/wup364/pakku/utils/constants/sqlconditions"
+	"github.com/wup364/pakku/utils/sqlexecutor"
 	"github.com/wup364/pakku/utils/sqlutil"
 	"github.com/wup364/pakku/utils/strutil"
 )
@@ -38,7 +38,7 @@ const (
 type UserRepo struct{}
 
 // Create 新建用户
-func (repo *UserRepo) Create(exec datasource.Exec, user dataobject.UserInfoPo) (res *dataobject.UserInfoPo, err error) {
+func (repo *UserRepo) Create(exec sqlexecutor.Exec, user dataobject.UserInfoPo) (res *dataobject.UserInfoPo, err error) {
 	if len(user.ID) == 0 {
 		user.ID = strutil.GetUUID()
 	}
@@ -52,7 +52,7 @@ func (repo *UserRepo) Create(exec datasource.Exec, user dataobject.UserInfoPo) (
 }
 
 // Query 查询用户
-func (repo *UserRepo) Query(exec datasource.Query, cmd cmds.QueryUserCmd) (res dtos.PageableResult[dtos.UserInfo], err error) {
+func (repo *UserRepo) Query(exec sqlexecutor.Query, cmd cmds.QueryUserCmd) (res dtos.PageableResult[dtos.UserInfo], err error) {
 	//
 	if res.Total, err = repo.CountQuery(exec, cmd); nil != err || res.Total == 0 {
 		return
@@ -78,7 +78,7 @@ func (repo *UserRepo) Query(exec datasource.Query, cmd cmds.QueryUserCmd) (res d
 }
 
 // CountQuery count查询用户
-func (repo *UserRepo) CountQuery(exec datasource.Query, cmd cmds.QueryUserCmd) (res int64, err error) {
+func (repo *UserRepo) CountQuery(exec sqlexecutor.Query, cmd cmds.QueryUserCmd) (res int64, err error) {
 	//
 	conditions := []string{"ACCOUNT = ?", "USER_NAME like ?"}
 	args := strutil.ToInterface(strutil.RemoveEmpty(cmd.Account, cmd.UserName)...)
