@@ -13,7 +13,7 @@ package repositoryutil
 import (
 	"pakkuboot/pakkusys/sysmodules/pakkudatasource"
 
-	"github.com/wup364/pakku/utils/sqlexecutor"
+	"github.com/wup364/pakku/utils/sqlutil/sqlexecutor"
 )
 
 // DDLGetter DDL脚本获取

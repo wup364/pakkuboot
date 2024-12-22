@@ -18,6 +18,7 @@ type CreateUserCmd struct {
 
 // QueryUserCmd 查询用户
 type QueryUserCmd struct {
+	PageableCmd
 	Account  string
 	UserName string
 }

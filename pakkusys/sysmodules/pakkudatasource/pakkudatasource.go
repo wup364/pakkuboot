@@ -12,7 +12,7 @@ package pakkudatasource
 import (
 	"database/sql"
 
-	"github.com/wup364/pakku/utils/sqlexecutor"
+	"github.com/wup364/pakku/utils/sqlutil/sqlexecutor"
 )
 
 // PakkuDataSource 数据源

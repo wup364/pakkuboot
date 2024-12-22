@@ -15,7 +15,7 @@ import (
 
 	"github.com/wup364/pakku/ipakku"
 	"github.com/wup364/pakku/utils/logs"
-	"github.com/wup364/pakku/utils/sqlexecutor"
+	"github.com/wup364/pakku/utils/sqlutil/sqlexecutor"
 )
 
 // PakkuDataSourceImpl 数据源

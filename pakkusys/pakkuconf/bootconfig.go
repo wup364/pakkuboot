@@ -16,7 +16,8 @@ import (
 	"pakkuboot/business/service/serviceimpl"
 	"pakkuboot/pakkusys"
 	"pakkuboot/pakkusys/pakkuconf/datasource"
-	"pakkuboot/pakkusys/pakkuconf/logger"
+	"pakkuboot/pakkusys/sysconstants"
+	"pakkuboot/pakkusys/sysmodules/logger"
 	"pakkuboot/pakkusys/sysmodules/pakkudatasource"
 
 	"github.com/wup364/pakku/ipakku"
@@ -72,5 +73,5 @@ func RegisterOverride(art pakkusys.ApplicationRT) []pakkusys.OverrideModule {
 
 // RegisterLoggerWriter 设置日志持久化写入器
 func RegisterLoggerWriter(logdir, logName string) io.Writer {
-	return logger.NewLoggerWriter4File(logdir, logName)
+	return logger.NewLoggerWriter4File(logdir, logName, sysconstants.C_MAX_LOG_FILES)
 }

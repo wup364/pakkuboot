@@ -11,15 +11,13 @@
 package repository
 
 import (
-	"database/sql"
 	"pakkuboot/business/objects/cmds"
 	"pakkuboot/business/objects/dtos"
 	"pakkuboot/business/repository/dataobject"
 	"time"
 
-	"github.com/wup364/pakku/utils/constants/sqlconditions"
-	"github.com/wup364/pakku/utils/sqlexecutor"
 	"github.com/wup364/pakku/utils/sqlutil"
+	"github.com/wup364/pakku/utils/sqlutil/sqlexecutor"
 	"github.com/wup364/pakku/utils/strutil"
 )
 
@@ -53,48 +51,30 @@ func (repo *UserRepo) Create(exec sqlexecutor.Exec, user dataobject.UserInfoPo) 
 
 // Query 查询用户
 func (repo *UserRepo) Query(exec sqlexecutor.Query, cmd cmds.QueryUserCmd) (res dtos.PageableResult[dtos.UserInfo], err error) {
-	//
-	if res.Total, err = repo.CountQuery(exec, cmd); nil != err || res.Total == 0 {
-		return
+	sqcb := sqlutil.NewQueryConditionBuilder().OrderByDesc("CTIME")
+
+	if len(cmd.Account) > 0 {
+		sqcb.Equals("ACCOUNT", cmd.Account)
+	}
+	if len(cmd.UserName) > 0 {
+		sqcb.Contains("USER_NAME", cmd.UserName)
 	}
 
 	//
-	conditions := []string{"ACCOUNT = ?", "USER_NAME like ?"}
-	args := strutil.ToInterface(strutil.RemoveEmpty(cmd.Account, cmd.UserName)...)
-
-	// 执行count查询
-	var rows *sql.Rows
-	sqlstr := sqlutil.SqlConditionConcatForWhere(sql_user_qry, sqlconditions.AND, conditions, cmd.Account, cmd.UserName)
-	if rows, err = exec.QueryWithPrepare(sqlstr, args...); nil != err {
-		sqlutil.CloseRowsSilence(rows)
+	if res.Total, err = sqlutil.NewSimpleQuery[int64](sql_user_count, sqcb.Build()).QueryFirstOne(exec); nil != err || res.Total == 0 {
 		return
 	}
 
-	res.Datas, err = sqlutil.ScanAndClose[dtos.UserInfo](rows, func(scan func(...any) error) (obj dtos.UserInfo, err error) {
-		return obj, scan(&obj.ID, &obj.Account, &obj.UserName, &obj.CTime)
-	})
-
+	sqcb.SetLimitOffsetPagination(cmd.Limit, cmd.Offset)
+	res.Datas, err = sqlutil.NewSimpleQuery[dtos.UserInfo](sql_user_qry, sqcb.Build()).QueryList(exec, repo.scanRow)
 	return
-}
-
-// CountQuery count查询用户
-func (repo *UserRepo) CountQuery(exec sqlexecutor.Query, cmd cmds.QueryUserCmd) (res int64, err error) {
-	//
-	conditions := []string{"ACCOUNT = ?", "USER_NAME like ?"}
-	args := strutil.ToInterface(strutil.RemoveEmpty(cmd.Account, cmd.UserName)...)
-
-	// 执行count查询
-	var rows *sql.Rows
-	sqlstr := sqlutil.SqlConditionConcatForWhere(sql_user_count, sqlconditions.AND, conditions, cmd.Account, cmd.UserName)
-	if rows, err = exec.QueryWithPrepare(sqlstr, args...); nil != err {
-		sqlutil.CloseRowsSilence(rows)
-		return
-	}
-
-	return sqlutil.ScanFirstOneAndClose[int64](rows)
 }
 
 // encodePwd 加密密码
 func (repo *UserRepo) encodePwd(pwd string) string {
 	return strutil.GetSHA256(pwd)
+}
+
+func (repo *UserRepo) scanRow(scan sqlutil.Scan) (obj dtos.UserInfo, err error) {
+	return obj, scan(&obj.ID, &obj.Account, &obj.UserName, &obj.CTime)
 }

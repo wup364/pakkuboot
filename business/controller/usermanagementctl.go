@@ -18,6 +18,7 @@ import (
 
 	"github.com/wup364/pakku/ipakku"
 	"github.com/wup364/pakku/utils/serviceutil"
+	"github.com/wup364/pakku/utils/strutil"
 )
 
 // UserManagementCtl 示例接口
@@ -34,7 +35,7 @@ func (ctl *UserManagementCtl) AsController() ipakku.ControllerConfig {
 			HandlerFunc: [][]interface{}{
 				{http.MethodGet, "", ctl.queryUser},
 				{http.MethodPost, "", ctl.createUser},
-				{http.MethodPut, "/:*", ctl.updateUser},
+				{http.MethodPut, ":*", ctl.updateUser},
 			},
 		},
 		FilterConfig: []ipakku.FilterConfigItem{
@@ -52,6 +53,10 @@ func (ctl *UserManagementCtl) queryUser(w http.ResponseWriter, r *http.Request) 
 		return ctl.usermg.Query(cmds.QueryUserCmd{
 			Account:  r.FormValue("account"),
 			UserName: r.FormValue("userName"),
+			PageableCmd: cmds.PageableCmd{
+				Limit:  strutil.String2Int(r.FormValue("limit"), 100),
+				Offset: strutil.String2Int(r.FormValue("offset"), 0),
+			},
 		})
 	})
 }

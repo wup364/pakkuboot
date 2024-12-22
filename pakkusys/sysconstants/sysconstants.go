@@ -12,6 +12,9 @@ package sysconstants
 const (
 	// C_DB_TYPE_SQLITE3 数据库类型 - sqlite3
 	C_DB_TYPE_SQLITE3 = "sqlite3"
+
+	// C_MAX_LOG_FILES 最大日志文件个数
+	C_MAX_LOG_FILES = 15
 )
 
 const (
